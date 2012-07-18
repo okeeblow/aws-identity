@@ -47,8 +47,8 @@ And another with an identity containing only an EC2 keypair:
 	Switched EC2 identity to client2
 
 	[nreid@minamo#nreid] export | grep -E 'EC2_CERT|EC2_PRIV|AWS_CRED'
-	EC2_CERT=/Users/nreid/aws-identities/seaworld/cert-YHGL5M3BBXFTMRYP3R42VNT32B634ESH.pem
-	EC2_PRIVATE_KEY=/Users/nreid/aws-identities/seaworld/pk-YHGL5M3BBXFTMRYP3R42VNT32B634ESH.pem
+	EC2_CERT=/Users/nreid/aws-identities/client2/cert-YHGL5M3BBXFTMRYP3R42VNT32B634ESH.pem
+	EC2_PRIVATE_KEY=/Users/nreid/aws-identities/client2/pk-YHGL5M3BBXFTMRYP3R42VNT32B634ESH.pem
 
 	[nreid@minamo#nreid] as-describe-auto-scaling-instances
 	INSTANCE  i-8c5733f5  Client2FB  us-east-1d  InService  HEALTHY  Client2FB
