@@ -1,0 +1,142 @@
+#!/bin/sh
+set -e
+
+# AWS Identity Switch
+# 
+# Author: Nicole Reid <root@cooltrainer.org>
+# Version: 2012-07-18
+#
+# Switch among multiple Amazon Web Services identities using this script.
+# Create a directory for each identity under $AWS_DIR. Each identity directory
+# may contain an EC2 cert/privkey pair, an AWS credential file, or both.
+# 
+# The certificate and private key may retain their original Amazon-generated
+# filenames. The credential file should look like:
+#
+# AWSAccessKeyId=accesskeyhere
+# AWSSecretKey=isureamtellingyoumysecretkeyrightnow
+
+# Configure these:
+AWS_DIR=~/aws-identities
+ACCESS_FILE_NAME="aws-credentials"
+
+# Die if grep is missing from $PATH
+hash grep 2>/dev/null || {echo >&2 "aws-identity requires grep, but it doesn't seem to be available.  Aborting."; exit 1;}
+
+usage()
+{
+     echo "AWS identity switch"
+     echo "usage: aws <account> [shell]"
+     echo ""
+     echo "<account> is a directory in $AWS_DIR containing EC2 certs and an AWS credentials file."
+	 echo "[shell] (sh or csh) will return commands suitable to eval to alter your shell environment."
+	 echo ""
+	 echo "Suggested usage: aws() {eval \`aws-identity \$1 sh\` && aws-identity \$1}"
+}
+
+if [ ! -d $AWS_DIR ]
+then
+	if [ ! -z $2 ]; then echo "AWS credential directory $AWS_DIR does not exist."; fi
+	exit
+fi
+
+# Must specify at least an identity name
+if [ $# -lt 1 ]
+then
+    usage
+    exit
+fi
+
+if [ -d $AWS_DIR/$1 ]
+then
+	# Not in either shell mode. Use dummy variables to avoid parse errors in conditionals.
+	if [ -z $2 ]; then 
+		COMMAND="export"
+		UNSET="unset"
+		SEPARATOR="="
+	# Bourne sh/zsh/ksh/bash mode
+	elif [ $2 == "sh" ]; then
+		COMMAND="export"
+		UNSET="unset"
+		SEPARATOR="="
+	# csh/tcsh mode
+	elif [ $2 == "csh" ]; then
+		COMMAND="setenv"
+		UNSET="unsetenv"
+		SEPARATOR=" "
+	fi
+
+	# Get count of {cert,pk}-*.pem in the directory.
+	# Glob them so we don't have to rename Amazon's auto-generated filenames.
+	# Redirect stderr to null to not pollute the shell if no files exist.
+	EC2_CERT_COUNT=`ls -1 $AWS_DIR/$1/cert*.pem 2>/dev/null | wc -l`
+	EC2_PK_COUNT=`ls -1 $AWS_DIR/$1/pk*.pem 2>/dev/null | wc -l`
+
+	# Success/failure for either set of credentials so we know what to set or unset.
+	EC2=false
+	AWS=false
+	
+	# A valid identity directory will have one of each.
+	if [ $EC2_CERT_COUNT == 1 ] && [ $EC2_PK_COUNT == 1 ]
+	then
+		EC2_CERT=`ls -1 $AWS_DIR/$1/cert*.pem`
+		EC2_PK=`ls -1 $AWS_DIR/$1/pk*.pem`
+		EC2=true
+
+		# Print commands if we're in a shell mode.
+		# Include trailing '&&' so the shell will properly eval the following line.
+		if [ ! -z $2 ]; then
+			echo "$COMMAND EC2_CERT${SEPARATOR}${EC2_CERT} && "
+			echo "$COMMAND EC2_PRIVATE_KEY${SEPARATOR}${EC2_PK} &&"
+		fi
+
+	# Unset EC2 credentials if we don't have one each cert and pk.
+	else
+
+		# Print commands if we're in a shell mode.
+		if [ ! -z $2 ]; then
+			echo "$UNSET EC2_CERT &&"
+			echo "$UNSET EC2_PRIVATE_KEY &&"
+		fi
+	fi
+
+	# Check if the chosen identity has an aws credential file.
+	if [ -f $AWS_DIR/$1/$ACCESS_FILE_NAME ]
+	then
+
+		# Test the file for the two necessary lines.
+		if grep -Fq AWSAccessKeyId $AWS_DIR/$1/$ACCESS_FILE_NAME && grep -Fq AWSSecretKey $AWS_DIR/$1/$ACCESS_FILE_NAME
+		then
+			AWS=true
+			if [ ! -z $2 ]; then
+				echo "$COMMAND AWS_CREDENTIAL_FILE${SEPARATOR}${AWS_DIR}/$1/$ACCESS_FILE_NAME"
+			fi
+
+		# Malformed credential file. Unset if we're in a shell mode.
+		else
+			if [ ! -z $2 ]; then echo "$UNSET AWS_CREDENTIAL_FILE"; fi
+		fi
+
+	# Missing credential file. Unset for this identity if we're in a shell mode.
+	else
+		if [ ! -z $2 ]; then echo "$UNSET AWS_CREDENTIAL_FILE"; fi
+	fi
+
+	# When not in a shell mode, describe what was set and what was unset.
+	if [ -z $2 ]; then
+		if $EC2 && $AWS; then
+			echo "Switched EC2 and AWS identity to $1"
+		elif $EC2; then
+			echo "Switched EC2 identity to $1"
+		elif $AWS; then
+			echo "Switched AWS identity to $1"
+		else
+			echo "Unable to switch either EC2 or AWS identity to $1"
+		fi
+	fi
+
+# Identity directory doesn't exist.
+else
+	if [ ! -z $2 ]; then echo "$AWS_DIR/$1 does not exist."; fi
+	exit 1
+fi
