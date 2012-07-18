@@ -21,7 +21,7 @@ AWS_DIR=~/aws-identities
 ACCESS_FILE_NAME="aws-credentials"
 
 # Die if grep is missing from $PATH
-hash grep 2>/dev/null || {echo >&2 "aws-identity requires grep, but it doesn't seem to be available.  Aborting."; exit 1;}
+hash grep 2>/dev/null || { echo >&2 "aws-identity requires grep, but it doesn't seem to be available.  Aborting."; exit 1; }
 
 usage()
 {
