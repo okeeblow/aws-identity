@@ -31,6 +31,11 @@ Here's an example with an identity containing both a keypair and a credential fi
 	EC2_CERT=/Users/nreid/aws-identities/client1/cert-ARFCVP24OJED4KQP2WXYPDX7XYV62UYJ.pem
 	EC2_PRIVATE_KEY=/Users/nreid/aws-identities/client1/pk-ARFCVP24OJED4KQP2WXYPDX7XYV62UYJ.pem
 
+	[nreid@minamo#nreid] as-describe-auto-scaling-instances 
+	INSTANCE  i-effb1d573  client1-promo  us-east-1a  InService  HEALTHY  client1-promo
+	INSTANCE  i-afd343ce3  client1-promo  us-east-1d  InService  HEALTHY  client1-promo
+
+
 And another with an identity containing only an EC2 keypair:
 
 	[nreid@minamo#nreid] bin/aws-identity client2 sh
@@ -44,6 +49,11 @@ And another with an identity containing only an EC2 keypair:
 	[nreid@minamo#nreid] export | grep -E 'EC2_CERT|EC2_PRIV|AWS_CRED'
 	EC2_CERT=/Users/nreid/aws-identities/seaworld/cert-YHGL5M3BBXFTMRYP3R42VNT32B634ESH.pem
 	EC2_PRIVATE_KEY=/Users/nreid/aws-identities/seaworld/pk-YHGL5M3BBXFTMRYP3R42VNT32B634ESH.pem
+
+	[nreid@minamo#nreid] as-describe-auto-scaling-instances
+	INSTANCE  i-8c5733f5  Client2FB  us-east-1d  InService  HEALTHY  Client2FB
+	INSTANCE  i-c45ed870  Client2FB  us-east-1b  InService  HEALTHY  Client2FB
+
 
 Lastly, CSH syntax:
 
