@@ -1,4 +1,4 @@
-_aws-identity ()
+_aws ()
 {
     local cur="${COMP_WORDS[COMP_CWORD]}"
     opts=$(for i in aws-identities/*/; do basename "$i"; done)
@@ -8,5 +8,18 @@ _aws-identity ()
     return 0
 }
 
-complete -F _aws-identity aws
+complete -F _aws aws
+
+_aws-identity ()
+{
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    opts=$(for i in aws-identities/*/; do basename "$i"; done)
+    if [ $COMP_CWORD -eq 1 ]; then
+        COMPREPLY=( $(compgen -o filenames -W "$opts" $cur) )
+    fi
+    if [ $COMP_CWORD -eq 2 ]; then
+        COMPREPLY=( $(compgen -o filenames -W "sh csh" $cur) )
+    fi
+    return 0
+}
 complete -F _aws-identity aws-identity
