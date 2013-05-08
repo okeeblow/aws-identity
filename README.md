@@ -61,3 +61,12 @@ Lastly, CSH syntax:
 	setenv EC2_CERT /Users/nreid/aws-identities/client2/cert-YHGL5M3BBXFTMRYP3R42VNT32B634ESH.pem && 
 	setenv EC2_PRIVATE_KEY /Users/nreid/aws-identities/client2/pk-YHGL5M3BBXFTMRYP3R42VNT32B634ESH.pem &&
 	unsetenv AWS_CREDENTIAL_FILE
+
+Bash-Completion
+
+    lfronius@Lars-MacBook-Pro ~ source aws-identity/bash_completion.d/aws-identity
+    lfronius@Lars-MacBook-Pro ~ aws [TAB][TAB]
+    jimdo lars
+    lfronius@Lars-MacBook-Pro ~ aws j[TAB]
+    lfronius@Lars-MacBook-Pro ~ aws jimdo
+    Switched EC2 and AWS identity to jimdo
