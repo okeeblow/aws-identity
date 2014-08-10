@@ -1,6 +1,8 @@
 aws-identity
 ============
 
+The canonical repository for aws-identity is at [cooltrainer.org/source](https://cooltrainer.org/source/). The GitHub remote is for social features like pull requests.
+
 This script makes it easier to switch among multiple Amazon Web Services identities for the AWS command line tools, as I must at work.
 
 Create a directory for each identity under $AWS_DIR (~/aws-identities by default). Each identity directory may contain an EC2 certificate and private key pair, an AWS credential file, or both. The certificate and private key may retain their original Amazon-generated filenames. The credential file should look like:
